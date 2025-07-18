@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "545117278311",
+    "project_id": "upnavmodule",
+    "storage_bucket": "upnavmodule.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545117278311:android:7d3cc23022fbc9ea70c4c2",
+        "android_client_info": {
+          "package_name": "com.example.up_nav_module"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLivTSg3GkSYB0y3ops2iJuAbEM8XfCZw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
