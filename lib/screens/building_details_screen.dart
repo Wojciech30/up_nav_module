@@ -1,114 +1,139 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../models/building.dart';
+import 'package:up_nav_module/models/building.dart';
+import 'package:up_nav_module/models/office.dart';
+import 'package:up_nav_module/screens/map_screen.dart';
+import 'package:up_nav_module/utils/contact_launcher.dart';
+import 'package:up_nav_module/widgets/building_image.dart';
 
 class BuildingDetailsScreen extends StatelessWidget {
   final Building building;
+
   const BuildingDetailsScreen({super.key, required this.building});
-
-  void _launchPhone(String phone) async {
-    final uri = Uri.parse('tel:$phone');
-    if (await canLaunchUrl(uri)) launchUrl(uri);
-  }
-
-  void _launchEmail(String email) async {
-    final uri = Uri.parse('mailto:$email');
-    if (await canLaunchUrl(uri)) launchUrl(uri);
-  }
 
   @override
   Widget build(BuildContext context) {
+    final hasImage =
+    (building.imageUrl != null && building.imageUrl!.isNotEmpty);
+
     return Scaffold(
-      appBar: AppBar(title: Text(building.name)),
+      appBar: AppBar(
+        title: Text(building.name),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.place),
+            tooltip: 'Pokaż na mapie',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MapScreen(building: building),
+                ),
+              );
+            },
+          )
+        ],
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
         children: [
-          Text(building.description, style: const TextStyle(fontSize: 16)),
-          const SizedBox(height: 16),
-
-          // Telefony
-          if (building.phones != null && building.phones!.isNotEmpty) ...[
-            Text('Telefon:', style: TextStyle(fontWeight: FontWeight.bold)),
-            ...building.phones!.map(
-                  (p) => GestureDetector(
-                onTap: () => _launchPhone(p),
-                child: Text(p, style: TextStyle(color: Colors.blue)),
-              ),
+          if (hasImage)
+            BuildingImage(
+              imageUrl: building.imageUrl,
+              width: double.infinity,
+              height: 220,
+              borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(16)),
+              fit: BoxFit.cover,
+            )
+          else
+            BuildingImage(
+              imageUrl: null,
+              width: double.infinity,
+              height: 220,
+              borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(16)),
+              fit: BoxFit.cover,
             ),
-            const SizedBox(height: 16),
-          ],
-
-          // E-maile
-          if (building.emails != null && building.emails!.isNotEmpty) ...[
-            Text('E-mail:', style: TextStyle(fontWeight: FontWeight.bold)),
-            ...building.emails!.map(
-                  (e) => GestureDetector(
-                onTap: () => _launchEmail(e),
-                child: Text(e, style: TextStyle(color: Colors.blue)),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-
-          // Dostępność
-          if (building.accessibility != null && building.accessibility!.isNotEmpty) ...[
-            Text('Dostępność:', style: TextStyle(fontWeight: FontWeight.bold)),
-            ...building.accessibility!.map((a) => Text("• $a")),
-            const SizedBox(height: 16),
-          ],
-
-          // Biura
-          if (building.offices != null && building.offices!.isNotEmpty) ...[
-            Text('Biura:', style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            ...building.offices!.map(
-                  (office) => ExpansionTile(
-                title: Text(office.name),
-                children: [
-                  if (office.roomNumber != null)
-                    ListTile(
-                      title: const Text('Numer pokoju'),
-                      subtitle: Text(office.roomNumber!.toString()),
-                    ),
-                  if (office.contactPerson != null)
-                    ListTile(
-                      title: const Text('Osoba odpowiedzialna'),
-                      subtitle: Text(office.contactPerson!),
-                    ),
-                  if (office.phones != null && office.phones!.isNotEmpty)
-                    ListTile(
-                      title: const Text('Telefon'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: office.phones!
-                            .map((p) => GestureDetector(
-                          onTap: () => _launchPhone(p),
-                          child: Text(p, style: TextStyle(color: Colors.blue)),
-                        ))
-                            .toList(),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(building.name,
+                    style: Theme.of(context).textTheme.headlineMedium),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, size: 20),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        building.address,
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
-                  if (office.emails != null && office.emails!.isNotEmpty)
-                    ListTile(
-                      title: const Text('E-mail'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: office.emails!
-                            .map((e) => GestureDetector(
-                          onTap: () => _launchEmail(e),
-                          child: Text(e, style: TextStyle(color: Colors.blue)),
-                        ))
-                            .toList(),
-                      ),
-                    ),
-                  ListTile(
-                    title: const Text('Godziny otwarcia'),
-                    subtitle: Text(office.openingHours),
+                  ],
+                ),
+                if (building.description.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    building.description,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],
-              ),
+                if ((building.accessibility ?? []).isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  Text('Dostępność',
+                      style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 8),
+                  for (final feature in building.accessibility!)
+                    Row(
+                      children: [
+                        const Icon(Icons.check, size: 20),
+                        const SizedBox(width: 6),
+                        Text(feature),
+                      ],
+                    ),
+                ],
+                if ((building.offices ?? []).isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  Text('Biura', style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 8),
+                  for (final Office office in building.offices!)
+                    ExpansionTile(
+                      title: Text(office.name),
+                      children: [
+                        if ((office.contactPerson ?? '').isNotEmpty)
+                          ListTile(
+                            leading: const Icon(Icons.person),
+                            title: Text(office.contactPerson!),
+                          ),
+                        if ((office.phones ?? []).isNotEmpty)
+                          ListTile(
+                            leading: const Icon(Icons.phone),
+                            title: Text(office.phones!.first),
+                            onTap: () => ContactLauncher.phone(
+                              office.phones!.first,
+                            ),
+                          ),
+                        if ((office.emails ?? []).isNotEmpty)
+                          ListTile(
+                            leading: const Icon(Icons.email),
+                            title: Text(office.emails!.first),
+                            onTap: () => ContactLauncher.email(
+                              office.emails!.first,
+                            ),
+                          ),
+                        if (office.openingHours.isNotEmpty)
+                          ListTile(
+                            leading: const Icon(Icons.access_time),
+                            title: Text(office.openingHours),
+                          ),
+                      ],
+                    ),
+                ],
+              ],
             ),
-          ],
+          ),
         ],
       ),
     );

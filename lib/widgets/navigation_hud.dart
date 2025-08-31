@@ -2,38 +2,29 @@ import 'package:flutter/material.dart';
 
 class NavigationHud extends StatelessWidget {
   final String instruction;
-  final double? distance;
 
-  const NavigationHud({
-    super.key,
-    required this.instruction,
-    this.distance,
-  });
+  const NavigationHud({super.key, required this.instruction});
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: 10,
-      left: 10,
-      right: 10,
-      child: Container(
-        padding: const EdgeInsets.all(12.0),
-        decoration: BoxDecoration(
-          color: Colors.black87,
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    return Material(
+      elevation: 4,
+      borderRadius: BorderRadius.circular(12),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
           children: [
-            if (distance != null)
-              Text(
-                'Za ${distance!.toStringAsFixed(0)} m:',
-                style: const TextStyle(color: Colors.white70, fontSize: 14.0),
+            const Icon(Icons.turn_right, size: 28, color: Colors.blue),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                instruction,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
-            Text(
-              instruction,
-              style: const TextStyle(color: Colors.white, fontSize: 16.0),
-              textAlign: TextAlign.center,
             ),
           ],
         ),

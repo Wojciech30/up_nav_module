@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 
 class RouteService {
-  Future<RoadInfo> getRoute({
-    required MapController mapController,
+  Future<RoadInfo> drawRoad({
+    required MapController controller,
     required GeoPoint start,
     required GeoPoint end,
-    required RoadType roadType,
-  }) {
-    return mapController.drawRoad(
+    required RoadType mode,
+  }) async {
+    final road = await controller.drawRoad(
       start,
       end,
-      roadType: roadType,
+      roadType: mode,
       roadOption: const RoadOption(
-        roadColor: Colors.indigo,
+        roadColor: Colors.blue,
         roadWidth: 8,
-        zoomInto: true,
       ),
     );
+    return road;
   }
 }

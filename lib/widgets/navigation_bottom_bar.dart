@@ -10,16 +10,63 @@ class NavigationBottomBar extends StatelessWidget {
     required this.duration,
   });
 
+  String _formatDistance(double km) {
+    if (km < 1) {
+      final meters = (km * 1000).round();
+      return "$meters m";
+    } else {
+      return "${km.toStringAsFixed(1)} km";
+    }
+  }
+
+  String _formatDuration(double minutes) {
+    if (minutes < 60) {
+      return "${minutes.round()} min";
+    } else {
+      final hours = (minutes ~/ 60);
+      final mins = (minutes % 60).round();
+      if (mins == 0) return "$hours h";
+      return "$hours h $mins min";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).primaryColor,
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(
-        'Pozostało: ${(distance / 1000).toStringAsFixed(2)} km · '
-            '${(duration ~/ 60)} min ${(duration % 60).toInt()} s',
-        style: const TextStyle(color: Colors.white, fontSize: 16),
-        textAlign: TextAlign.center,
+    return Material(
+      elevation: 4,
+      borderRadius: BorderRadius.circular(12),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.route, color: Colors.blue),
+                const SizedBox(width: 8),
+                Text(
+                  _formatDistance(distance),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                const Icon(Icons.access_time, color: Colors.blue),
+                const SizedBox(width: 8),
+                Text(
+                  _formatDuration(duration),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

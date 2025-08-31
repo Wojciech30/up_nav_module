@@ -10,6 +10,7 @@ class Building {
   final List<Office>? offices;
   final double latitude;
   final double longitude;
+  final String? imageUrl;
 
   Building({
     required this.name,
@@ -21,5 +22,6 @@ class Building {
     this.offices,
     required this.latitude,
     required this.longitude,
+    this.imageUrl,
   });
 }
